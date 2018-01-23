@@ -1,3 +1,5 @@
+package src;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -13,7 +15,6 @@ public class ConnectionManager {
             }
         } catch (IOException e) {
             System.err.println("Fout met luisteren");
-            System.exit(-1);
         }
     }
 }
