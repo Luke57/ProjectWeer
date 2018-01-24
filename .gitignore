@@ -1,3 +1,6 @@
+/nbproject/
 /out/
 /.idea/
 WeerPusher.iml
+build.xml
+manifest.mf
