@@ -15,13 +15,14 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class XMLParser {
     
     public static void parse(StringBuilder data) {
-        //System.out.println(input.toString());
+        //System.out.println(data.toString());
         //System.out.println();
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         try{
@@ -33,11 +34,38 @@ public class XMLParser {
             NodeList nodes = doc.getElementsByTagName("MEASUREMENT");
             
             for (int i = 0; i < nodes.getLength(); i++) {
-                System.out.println("" + nodes.item(i).getTextContent());
+                NodeList subnodes = nodes.item(0).getChildNodes();
+                    for(int j = 0; j<(subnodes.getLength());j++){
+                        try{
+                            String tag = subnodes.item(j).getNodeName();
+                            String value = subnodes.item(j).getTextContent();
+                            System.out.println(tag+" "+value);
+                        } catch(NullPointerException e){
+                            System.out.println("MISSING VALUE");
+                        }
+                    }
+                System.out.println("--------------");
+                
+                
             }
             
         } catch(SAXException | IOException | ParserConfigurationException e){
             e.printStackTrace();
         }
     }
+    /*
+    public static void doSomething(Element element) {
+    // do something with the current node instead of System.out
+    System.out.println(node.getNodeName()+" "+element);
+
+    NodeList nodeList = node.getChildNodes();
+    for (int i = 0; i < nodeList.getLength(); i++) {
+        Node currentNode = nodeList.item(i);
+        if (currentNode.getNodeType() == Node.ELEMENT_NODE) {
+            //calls this method for all the children which is Element
+            doSomething(currentNode);
+        }
+    }
+    }
+    */
 }
