@@ -1,5 +1,3 @@
-package src;
-
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.FileNotFoundException;
