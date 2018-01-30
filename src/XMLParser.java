@@ -50,31 +50,17 @@ public class XMLParser {
                 String WNDDIR = e.getElementsByTagName("WNDDIR").item(0).getTextContent();
                 //System.out.println(STN+" "+DATE+" "+TIME+" "+TEMP+" "+DEWP+" "+STP+" "+SLP+" "+VISIB+" "+WDSP+" "+PRCP+" "+SNDP+" "+FRSHTT+" "+CLDC+" "+WNDDIR);
                 
-                integrityChecker.check("TEMP", TEMP);
-                integrityChecker.check("DEWP", DEWP);
-                integrityChecker.check("STP", STP);
-                integrityChecker.check("SLP", SLP);
-                integrityChecker.check("VISIB", VISIB);
-                integrityChecker.check("WDSP", WDSP);
-                integrityChecker.check("PRCP", PRCP);
-                integrityChecker.check("SNDP", SNDP);
-                integrityChecker.check("CLDC", CLDC);
-                integrityChecker.check("WNDDIR", WNDDIR);
-                /*
-                NodeList subnodes = nodes.item(0).getChildNodes();
+                TEMP = integrityChecker.check("TEMP", TEMP);
+                DEWP = integrityChecker.check("DEWP", DEWP);
+                STP = integrityChecker.check("STP", STP);
+                SLP = integrityChecker.check("SLP", SLP);
+                VISIB = integrityChecker.check("VISIB", VISIB);
+                WDSP = integrityChecker.check("WDSP", WDSP);
+                PRCP = integrityChecker.check("PRCP", PRCP);
+                SNDP = integrityChecker.check("SNDP", SNDP);
+                CLDC = integrityChecker.check("CLDC", CLDC);
+                WNDDIR = integrityChecker.check("WNDDIR", WNDDIR);
                 
-                String stn = subnodes.getAttributes();
-                    for(int j = 0; j<(subnodes.getLength());j++){
-                        try{
-                            String tag = subnodes.item(j).getNodeName();
-                            String value = subnodes.item(j).getTextContent();
-                            System.out.println(tag+" "+value);
-                        } catch(NullPointerException e){
-                            System.out.println("MISSING VALUE");
-                        }
-                    }
-                System.out.println("--------------");
-                */
                 
             }
             
@@ -82,19 +68,5 @@ public class XMLParser {
             e.printStackTrace();
         }
     }
-    /*
-    public static void doSomething(Element element) {
-    // do something with the current node instead of System.out
-    System.out.println(node.getNodeName()+" "+element);
-
-    NodeList nodeList = node.getChildNodes();
-    for (int i = 0; i < nodeList.getLength(); i++) {
-        Node currentNode = nodeList.item(i);
-        if (currentNode.getNodeType() == Node.ELEMENT_NODE) {
-            //calls this method for all the children which is Element
-            doSomething(currentNode);
-        }
-    }
-    }
-    */
+    
 }
