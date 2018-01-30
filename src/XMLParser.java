@@ -19,7 +19,7 @@ import org.xml.sax.SAXException;
 
 public class XMLParser {
     
-    public static void parse(StringBuilder data) {
+    public static void parse(StringBuilder data, DataIntegrityChecker integrityChecker) {
         //System.out.println(data.toString());
         //System.out.println();
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -29,10 +29,41 @@ public class XMLParser {
             Document doc = builder.parse(input);
             doc.getDocumentElement().normalize();
             
-            NodeList nodes = doc.getElementsByTagName("MEASUREMENT");
-            
+            NodeList nodes = doc.getElementsByTagName("WEATHERDATA");
+            Element nodeElements =  (Element) nodes.item(0);
+            NodeList dataElements = nodeElements.getElementsByTagName("MEASUREMENT");
             for (int i = 0; i < nodes.getLength(); i++) {
+                Element e = (Element) dataElements.item(0);
+                String STN = e.getElementsByTagName("STN").item(0).getTextContent();
+                String DATE = e.getElementsByTagName("DATE").item(0).getTextContent();
+                String TIME = e.getElementsByTagName("TIME").item(0).getTextContent();
+                String TEMP = e.getElementsByTagName("TEMP").item(0).getTextContent();
+                String DEWP = e.getElementsByTagName("DEWP").item(0).getTextContent();
+                String STP = e.getElementsByTagName("STP").item(0).getTextContent();
+                String SLP = e.getElementsByTagName("SLP").item(0).getTextContent();
+                String VISIB = e.getElementsByTagName("VISIB").item(0).getTextContent();
+                String WDSP = e.getElementsByTagName("WDSP").item(0).getTextContent();
+                String PRCP = e.getElementsByTagName("PRCP").item(0).getTextContent();
+                String SNDP = e.getElementsByTagName("SNDP").item(0).getTextContent();
+                String FRSHTT = e.getElementsByTagName("FRSHTT").item(0).getTextContent();
+                String CLDC = e.getElementsByTagName("CLDC").item(0).getTextContent();
+                String WNDDIR = e.getElementsByTagName("WNDDIR").item(0).getTextContent();
+                //System.out.println(STN+" "+DATE+" "+TIME+" "+TEMP+" "+DEWP+" "+STP+" "+SLP+" "+VISIB+" "+WDSP+" "+PRCP+" "+SNDP+" "+FRSHTT+" "+CLDC+" "+WNDDIR);
+                
+                integrityChecker.check("TEMP", TEMP);
+                integrityChecker.check("DEWP", DEWP);
+                integrityChecker.check("STP", STP);
+                integrityChecker.check("SLP", SLP);
+                integrityChecker.check("VISIB", VISIB);
+                integrityChecker.check("WDSP", WDSP);
+                integrityChecker.check("PRCP", PRCP);
+                integrityChecker.check("SNDP", SNDP);
+                integrityChecker.check("CLDC", CLDC);
+                integrityChecker.check("WNDDIR", WNDDIR);
+                /*
                 NodeList subnodes = nodes.item(0).getChildNodes();
+                
+                String stn = subnodes.getAttributes();
                     for(int j = 0; j<(subnodes.getLength());j++){
                         try{
                             String tag = subnodes.item(j).getNodeName();
@@ -43,7 +74,7 @@ public class XMLParser {
                         }
                     }
                 System.out.println("--------------");
-                
+                */
                 
             }
             
