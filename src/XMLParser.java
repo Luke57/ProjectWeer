@@ -50,16 +50,16 @@ public class XMLParser {
                 String WNDDIR = e.getElementsByTagName("WNDDIR").item(0).getTextContent();
                 //System.out.println(STN+" "+DATE+" "+TIME+" "+TEMP+" "+DEWP+" "+STP+" "+SLP+" "+VISIB+" "+WDSP+" "+PRCP+" "+SNDP+" "+FRSHTT+" "+CLDC+" "+WNDDIR);
                 
-                TEMP = integrityChecker.check("TEMP", TEMP);
-                DEWP = integrityChecker.check("DEWP", DEWP);
-                STP = integrityChecker.check("STP", STP);
-                SLP = integrityChecker.check("SLP", SLP);
-                VISIB = integrityChecker.check("VISIB", VISIB);
-                WDSP = integrityChecker.check("WDSP", WDSP);
-                PRCP = integrityChecker.check("PRCP", PRCP);
-                SNDP = integrityChecker.check("SNDP", SNDP);
-                CLDC = integrityChecker.check("CLDC", CLDC);
-                WNDDIR = integrityChecker.check("WNDDIR", WNDDIR);
+                TEMP = integrityChecker.check(STN,"TEMP", TEMP);
+                DEWP = integrityChecker.check(STN,"DEWP", DEWP);
+                STP = integrityChecker.check(STN,"STP", STP);
+                SLP = integrityChecker.check(STN,"SLP", SLP);
+                VISIB = integrityChecker.check(STN,"VISIB", VISIB);
+                WDSP = integrityChecker.check(STN,"WDSP", WDSP);
+                PRCP = integrityChecker.check(STN,"PRCP", PRCP);
+                SNDP = integrityChecker.check(STN,"SNDP", SNDP);
+                CLDC = integrityChecker.check(STN,"CLDC", CLDC);
+                WNDDIR = integrityChecker.check(STN,"WNDDIR", WNDDIR);
                 
                 
             }
