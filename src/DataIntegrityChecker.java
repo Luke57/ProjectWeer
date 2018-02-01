@@ -1,4 +1,6 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -6,6 +8,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,12 +32,27 @@ public class DataIntegrityChecker {
     private String tag;
     private HashMap stations;
     private HashMap values;
+    private Writer writer;
     
-    private File f = new File("tempdata_serialized");
+    private FileOutputStream fos;
+    private ObjectOutputStream oos;
+    
+    private String path = "C:\\Users\\xd\\Documents\\NetBeansProjects\\ProjectWeer\\resources\\data_serialized.sec";
+    
+    public DataIntegrityChecker(){
+        if(writer == null){
+            createFile();
+        }
+        
+    }
     public String check(String stn,String tag, String value){
         this.tag = tag;
         this.stn = stn;
-        this.value = Double.valueOf(value);
+        try{
+            this.value = Double.valueOf(value);
+        } catch(NumberFormatException e){
+            this.value = 0.0;                //remove null value TODO
+        }
         switch(tag){
             case "TEMP":
                 this.value = checkAvg("tempAvg", this.value);
@@ -70,12 +89,13 @@ public class DataIntegrityChecker {
                 break;
         }
         value = String.valueOf(this.value);
-        System.out.println(tag+" "+value);
+        //System.out.println(tag+" "+value);
         return value;
     } 
     private Double checkAvg(String avg, Double value){
+        /*
         try{
-                FileInputStream fis = new FileInputStream(f);
+                FileInputStream fis = new FileInputStream(path);
                 ObjectInputStream ois = new ObjectInputStream(fis);             
                 try{
                     stations = (HashMap) ois.readObject();                      //read file f
@@ -97,35 +117,67 @@ public class DataIntegrityChecker {
                     i++;
                     it.next();
                 }
-                /*
+                
                 if((Math.min(avgF, value)/Math.max(avgF, value)) > 0.80){
                         
                 } else{
                     value = avgF;
                 }
-                */
+                
             } catch(IOException e){
                 e.printStackTrace();
             }
-        
+        */
+        store(tag,value);
         return value;
     }
     private void store(String tag, Double value){
         try{
-            //BufferedReader reader = new BufferedReader(new FileReader(f));
+            ArrayList valueArray;
+            //fis = new FileInputStream(path);
+            FileInputStream fis = new FileInputStream(path);
+            try{
+                ObjectInputStream ois = new ObjectInputStream(fis);
+                stations = (HashMap) ois.readObject();
+                
+            } catch(EOFException e){
+                stations = new HashMap();
+            }
+            fis.close();
+          
+            if(stations.get(stn)==null) values = new HashMap();
+            else values=(HashMap)stations.get(stn);
+
+            if(values.get(tag)==null) valueArray = new ArrayList();
+            else valueArray = (ArrayList) values.get(tag);
             
-            stations = new HashMap<String, HashMap>();
-            values = new HashMap<String, ArrayList<Double>>();
-            ArrayList arr = values.get(tag);
-            arr.add(value);
+            //stations = new HashMap<String, HashMap>();
+            //values = (HashMap) stations.get(stn);
+            //ArrayList arr = (ArrayList)values.get(tag);
+            if(valueArray.size()>=30){
+                valueArray.remove(0);
+            }
+            valueArray.add(value);
             values.remove(tag);
-            values.put(tag, arr);
+            values.put(tag, valueArray);
+            stations.put(stn, values);
             
-            FileOutputStream fos = new FileOutputStream(f);   
-            ObjectOutputStream oos = new ObjectOutputStream(fos);           
-            oos.writeObject(stations); 
-            oos.flush();
-        } catch (IOException e){
+            System.out.println(stations.toString());
+            
+               
+            fos = new FileOutputStream(path); 
+            oos = new ObjectOutputStream(fos);  
+            oos.writeObject(stations);
+            oos.close();
+            fos.close();
+        } catch (IOException | ClassNotFoundException e){
+            e.printStackTrace();
+        }
+    }
+    private void createFile(){
+        try{
+            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path), "utf-8"));
+        } catch(IOException e){
             e.printStackTrace();
         }
     }
