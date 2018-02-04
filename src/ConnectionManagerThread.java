@@ -6,7 +6,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 public class ConnectionManagerThread extends Thread{
-    private Socket socket = null;
+    private Socket socket;
     private BufferedReader dataIn;
     private DataIntegrityChecker integrityChecker = new DataIntegrityChecker();
 
@@ -28,7 +28,7 @@ public class ConnectionManagerThread extends Thread{
 
                     if(xml.contains("</WEATHERDATA")){
                         //weatherdata.append("</WEATHERDATA>");
-                        XMLParser.parse(weatherdata, integrityChecker);
+                        XMLParser.parse(weatherdata, integrityChecker); //return the parsed weatherdata and send it on it's way
                         //System.out.println(weatherdata);
                         //System.out.println(arraydata.toString());
                         //integrityChecker.check(arraydata);

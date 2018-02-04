@@ -1,4 +1,5 @@
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -11,6 +12,11 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -19,13 +25,16 @@ import org.xml.sax.SAXException;
 
 public class XMLParser {
     
-    public static void parse(StringBuilder data, DataIntegrityChecker integrityChecker) {
+    public static StringBuilder parse(StringBuilder data, DataIntegrityChecker integrityChecker) {
         //System.out.println(data.toString());
         //System.out.println();
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        StringBuilder dataOut = new StringBuilder();
+        System.out.println("voor: "+data);
         try{
             DocumentBuilder builder = factory.newDocumentBuilder();
             ByteArrayInputStream input = new ByteArrayInputStream(data.toString().getBytes("UTF-8"));
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
             Document doc = builder.parse(input);
             doc.getDocumentElement().normalize();
             
@@ -60,13 +69,37 @@ public class XMLParser {
                 SNDP = integrityChecker.check(STN,"SNDP", SNDP);
                 CLDC = integrityChecker.check(STN,"CLDC", CLDC);
                 WNDDIR = integrityChecker.check(STN,"WNDDIR", WNDDIR);
+        
+                e.getElementsByTagName("TEMP").item(0).setTextContent(TEMP);
+                e.getElementsByTagName("DEWP").item(0).setTextContent(DEWP);
+                e.getElementsByTagName("STP").item(0).setTextContent(STP);
+                e.getElementsByTagName("SLP").item(0).setTextContent(SLP);
+                e.getElementsByTagName("VISIB").item(0).setTextContent(VISIB);
+                e.getElementsByTagName("WDSP").item(0).setTextContent(WDSP);
+                e.getElementsByTagName("PRCP").item(0).setTextContent(PRCP);
+                e.getElementsByTagName("SNDP").item(0).setTextContent(SNDP);
+                e.getElementsByTagName("CLDC").item(0).setTextContent(CLDC);
+                e.getElementsByTagName("WNDDIR").item(0).setTextContent(WNDDIR);
+                
                 
                 
             }
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            DOMSource source = new DOMSource(doc);
+            StreamResult result = new StreamResult(output);
+            transformer.transform(source, result);
             
-        } catch(SAXException | IOException | ParserConfigurationException e){
+            System.out.println("na: "+output);
+            
+            StringBuilder outputString = new StringBuilder();
+            outputString.append(output.toString("UTF-8"));
+            
+            
+        } catch(SAXException | IOException | ParserConfigurationException | TransformerException e){
             e.printStackTrace();
         }
+        return outputString;
     }
     
 }
