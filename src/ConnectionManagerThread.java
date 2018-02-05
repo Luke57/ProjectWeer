@@ -1,50 +1,52 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.ServerSocket;
+import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.ArrayList;
+
 
 public class ConnectionManagerThread extends Thread{
-    private Socket socket;
+    private final Socket inputSocket;
+    private Socket outputSocket;
     private BufferedReader dataIn;
-    private DataIntegrityChecker integrityChecker = new DataIntegrityChecker();
+    private PrintWriter dataOut;
+    private StringBuilder weatherdataParsed;
+    private final DataIntegrityChecker integrityChecker = new DataIntegrityChecker();
+    private final XMLParser parser = new XMLParser();
 
     public ConnectionManagerThread(Socket socket){
-        this.socket = socket;
+        inputSocket = socket;
     }
 
+    @Override
     public void run(){
         try {
+            outputSocket = new Socket("localhost",7790);
             while (true) {
-                dataIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-                String xml = null;
+                dataIn = new BufferedReader(new InputStreamReader(inputSocket.getInputStream()));
+                dataOut = new PrintWriter(outputSocket.getOutputStream());
+               
+                String xml;
                 StringBuilder weatherdata = new StringBuilder();
-                ArrayList arraydata = new ArrayList<>();
                 while((xml = dataIn.readLine().replaceAll("<\\?xml(.+?)\\?>", "").trim())!= null){
                     weatherdata.append(xml);
-                    arraydata.add(xml);
-
                     if(xml.contains("</WEATHERDATA")){
-                        //weatherdata.append("</WEATHERDATA>");
-                        XMLParser.parse(weatherdata, integrityChecker); //return the parsed weatherdata and send it on it's way
-                        //System.out.println(weatherdata);
-                        //System.out.println(arraydata.toString());
-                        //integrityChecker.check(arraydata);
-                        arraydata.clear();
+                        weatherdataParsed = parser.parse(weatherdata, integrityChecker); //return the parsed weatherdata and send it on it's way
                         weatherdata = new StringBuilder();
-                    }
+                        dataOut.write(weatherdataParsed.toString());
+                        dataOut.flush();
+                        dataOut.close();
+                    } 
                 }
-
             }
         } catch (Exception e){
             e.printStackTrace();
         } finally {
-            if(socket != null) {
+            if(inputSocket != null) {
                 try {
                     dataIn.close();
-                    socket.close();
+                    dataOut.close();
+                    inputSocket.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

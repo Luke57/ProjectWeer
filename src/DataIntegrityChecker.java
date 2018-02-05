@@ -27,7 +27,7 @@ public class DataIntegrityChecker {
     private FileOutputStream fos;
     private ObjectOutputStream oos;
     
-    private String path = "C:\\Users\\Eloy\\Documents\\NetBeansProjects\\ProjectWeer\\resources\\data_serialized.sec";
+    private final String path = "C:\\Users\\xd\\Documents\\NetBeansProjects\\ProjectWeer\\resources\\data_serialized.sec";
     
     public DataIntegrityChecker(){
         if(writer == null){
@@ -45,23 +45,15 @@ public class DataIntegrityChecker {
             this.value = extrapolate(this.value);
         }
         
-        if(tag == "TEMP"){
-            //System.out.println("Dit is een temperatuur waarde "+value);
+        if(tag.equals("TEMP")){
             Double extrapolated = extrapolate(this.value);
-            
-            //System.out.println("value: "+this.value);
-            //System.out.println("extrapolated: "+extrapolated);
-            //System.out.println("min: "+min(extrapolated,this.value));
-            //System.out.println("max: "+max(extrapolated,this.value));
-            
+
             if(this.value > 0 && extrapolated > 0){
                 if(min(extrapolated,this.value)/max(extrapolated,this.value )<0.8){
-                    //System.out.println("Deze temperatuurwaarde "+this.value+" verschild meer dan 20% van "+extrapolated);
                     this.value = extrapolated;  
                 }
             } else{
                 if(max(extrapolated,this.value)/min(extrapolated,this.value )<0.8){
-                    //System.out.println("Deze temperatuurwaarde "+this.value+" verschild meer dan 20% van "+extrapolated);
                     this.value = extrapolated;   
                 }
             }
@@ -69,7 +61,6 @@ public class DataIntegrityChecker {
 
         store();
         value = String.valueOf(this.value);
-        //System.out.println(tag+" "+value);
         return value;
     } 
     private Double extrapolate(Double valueExtra){
@@ -93,9 +84,7 @@ public class DataIntegrityChecker {
                     for(int i=0;i<valueArray.size();i++){
                         count+=(Double)valueArray.get(i);
                     }
-                    //System.out.println(count);
-                    //System.out.println(valueArray.size());
-                    //System.out.println(count/valueArray.size());
+                    
                     valueExtra = count/valueArray.size();
                     valueExtra = round(valueExtra, 2);
                     
@@ -136,8 +125,6 @@ public class DataIntegrityChecker {
             values.put(tag, valueArray);
             stations.put(stn, values);
             
-            //System.out.println(stations.toString());
-               
             fos = new FileOutputStream(path); 
             oos = new ObjectOutputStream(fos);  
             oos.writeObject(stations);

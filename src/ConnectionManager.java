@@ -1,15 +1,9 @@
-package src;
-
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.ServerSocket;
 
 public class ConnectionManager {
     public ConnectionManager() throws IOException {
-        int port = 7789;
-
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
+        try (ServerSocket serverSocket = new ServerSocket(7789)) {
             while(true) {
                 new ConnectionManagerThread(serverSocket.accept()).start();
             }

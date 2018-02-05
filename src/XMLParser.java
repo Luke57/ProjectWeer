@@ -1,17 +1,10 @@
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -19,18 +12,13 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class XMLParser {
-    
-    public static StringBuilder parse(StringBuilder data, DataIntegrityChecker integrityChecker) {
-        //System.out.println(data.toString());
-        //System.out.println();
+    StringBuilder outputString;
+    public StringBuilder parse(StringBuilder data, DataIntegrityChecker integrityChecker) {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        StringBuilder dataOut = new StringBuilder();
-        System.out.println("voor: "+data);
         try{
             DocumentBuilder builder = factory.newDocumentBuilder();
             ByteArrayInputStream input = new ByteArrayInputStream(data.toString().getBytes("UTF-8"));
@@ -57,7 +45,6 @@ public class XMLParser {
                 String FRSHTT = e.getElementsByTagName("FRSHTT").item(0).getTextContent();
                 String CLDC = e.getElementsByTagName("CLDC").item(0).getTextContent();
                 String WNDDIR = e.getElementsByTagName("WNDDIR").item(0).getTextContent();
-                //System.out.println(STN+" "+DATE+" "+TIME+" "+TEMP+" "+DEWP+" "+STP+" "+SLP+" "+VISIB+" "+WDSP+" "+PRCP+" "+SNDP+" "+FRSHTT+" "+CLDC+" "+WNDDIR);
                 
                 TEMP = integrityChecker.check(STN,"TEMP", TEMP);
                 DEWP = integrityChecker.check(STN,"DEWP", DEWP);
@@ -89,10 +76,8 @@ public class XMLParser {
             DOMSource source = new DOMSource(doc);
             StreamResult result = new StreamResult(output);
             transformer.transform(source, result);
-            
-            System.out.println("na: "+output);
-            
-            StringBuilder outputString = new StringBuilder();
+  
+            outputString = new StringBuilder();
             outputString.append(output.toString("UTF-8"));
             
             
