@@ -5,7 +5,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 
-public class ConnectionManagerThread extends Thread{
+public class ConnectionManagerThread  implements Runnable{
     private final Socket inputSocket;
     private Socket outputSocket;
     private BufferedReader dataIn;
@@ -20,6 +20,7 @@ public class ConnectionManagerThread extends Thread{
 
     @Override
     public void run(){
+        System.out.println("Thread: "+Thread.currentThread().getId());
         try {
             outputSocket = new Socket("localhost",7790);
             while (true) {

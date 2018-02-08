@@ -5,7 +5,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OptionalDataException;
 import java.io.OutputStreamWriter;
+import java.io.StreamCorruptedException;
 import java.io.Writer;
 import static java.lang.Double.max;
 import static java.lang.Double.min;
@@ -13,6 +15,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 public class DataIntegrityChecker {
@@ -24,12 +27,15 @@ public class DataIntegrityChecker {
     private Writer writer;
     private ArrayList valueArray;
     
+    private ReentrantLock lock = new ReentrantLock();
     private FileOutputStream fos;
     private ObjectOutputStream oos;
     
-    private final String path = "C:\\Users\\xd\\Documents\\NetBeansProjects\\ProjectWeer\\resources\\data_serialized.sec";
+    private final String path;//Edit this path to 
     
     public DataIntegrityChecker(){
+        String userName = System.getProperty("user.name");
+        path  = "C:\\Users\\"+userName+"\\Documents\\NetBeansProjects\\ProjectWeer\\resources\\data_serialized.sec"; //Directory where the serialized file is saved (edit when running on the pi)
         if(writer == null){
             createFile();
         }
@@ -38,11 +44,13 @@ public class DataIntegrityChecker {
     public String check(String stn, String tag, String value){
         this.tag = tag;
         this.stn = stn;
+        System.out.println(stn+": "+tag+": "+value);
         try{
             this.value = Double.valueOf(value);
         } catch(NumberFormatException e){
             System.out.println("Value "+this.tag+" is missing");
             this.value = extrapolate(this.value);
+            System.out.println("The new value is: "+this.value);
         }
         
         if(tag.equals("TEMP")){
@@ -70,6 +78,7 @@ public class DataIntegrityChecker {
             try{
                 ObjectInputStream ois = new ObjectInputStream(fis);
                 stations = (HashMap) ois.readObject();
+                ois.close();
             } catch(EOFException e){
                 stations = new HashMap();
             }
@@ -86,9 +95,7 @@ public class DataIntegrityChecker {
                     }
                     
                     valueExtra = count/valueArray.size();
-                    valueExtra = round(valueExtra, 2);
-                    
-                    
+                    valueExtra = round(valueExtra, 2); 
                 }
             } 
         } catch(IOException | ClassNotFoundException e){
@@ -108,6 +115,8 @@ public class DataIntegrityChecker {
                 
             } catch(EOFException e){
                 stations = new HashMap();
+            } catch(StreamCorruptedException | OptionalDataException e){
+                System.err.println("Stream corruption exception");
             }
             fis.close();
           

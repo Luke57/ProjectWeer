@@ -1,6 +1,8 @@
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OptionalDataException;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -17,8 +19,10 @@ import org.xml.sax.SAXException;
 
 public class XMLParser {
     StringBuilder outputString;
+    private ReentrantLock lock = new ReentrantLock();
     public StringBuilder parse(StringBuilder data, DataIntegrityChecker integrityChecker) {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        System.out.println(data.toString());
         try{
             DocumentBuilder builder = factory.newDocumentBuilder();
             ByteArrayInputStream input = new ByteArrayInputStream(data.toString().getBytes("UTF-8"));
@@ -29,8 +33,8 @@ public class XMLParser {
             NodeList nodes = doc.getElementsByTagName("WEATHERDATA");
             Element nodeElements =  (Element) nodes.item(0);
             NodeList dataElements = nodeElements.getElementsByTagName("MEASUREMENT");
-            for (int i = 0; i < nodes.getLength(); i++) {
-                Element e = (Element) dataElements.item(0);
+            for (int i = 0; i < dataElements.getLength(); i++) {
+                Element e = (Element) dataElements.item(i);
                 String STN = e.getElementsByTagName("STN").item(0).getTextContent();
                 String DATE = e.getElementsByTagName("DATE").item(0).getTextContent();
                 String TIME = e.getElementsByTagName("TIME").item(0).getTextContent();
@@ -56,7 +60,7 @@ public class XMLParser {
                 SNDP = integrityChecker.check(STN,"SNDP", SNDP);
                 CLDC = integrityChecker.check(STN,"CLDC", CLDC);
                 WNDDIR = integrityChecker.check(STN,"WNDDIR", WNDDIR);
-        
+                
                 e.getElementsByTagName("TEMP").item(0).setTextContent(TEMP);
                 e.getElementsByTagName("DEWP").item(0).setTextContent(DEWP);
                 e.getElementsByTagName("STP").item(0).setTextContent(STP);
@@ -82,7 +86,7 @@ public class XMLParser {
             
             
         } catch(SAXException | IOException | ParserConfigurationException | TransformerException e){
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         return outputString;
     }
